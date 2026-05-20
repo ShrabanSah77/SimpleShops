@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,7 +16,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.simpleshop.ui.screens.CartScreen
 import com.example.simpleshop.ui.screens.HomeScreen
-import com.example.simpleshop.ui.screens.LoginScreen
 import com.example.simpleshop.ui.theme.SimpleShopTheme
 import com.example.simpleshop.viewmodel.ShopViewModel
 
@@ -41,24 +39,14 @@ class MainActivity : ComponentActivity() {
 fun ShopApp() {
     val viewModel: ShopViewModel = viewModel()
     val navController = rememberNavController()
-    val user by viewModel.currentUser.collectAsState()
 
-    val loginRoute = stringResource(R.string.login_route)
     val homeRoute = stringResource(R.string.home_route)
     val cartRoute = stringResource(R.string.cart_route)
 
     NavHost(
         navController = navController,
-        startDestination = if (user == null) loginRoute else homeRoute
+        startDestination = homeRoute
     ) {
-        composable(loginRoute) {
-            LoginScreen(onLoginSuccess = { username ->
-                viewModel.login(username)
-                navController.navigate(homeRoute) {
-                    popUpTo(loginRoute) { inclusive = true }
-                }
-            })
-        }
         composable(homeRoute) {
             HomeScreen(
                 viewModel = viewModel,

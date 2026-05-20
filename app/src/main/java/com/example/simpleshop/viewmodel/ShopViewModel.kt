@@ -1,12 +1,14 @@
 package com.example.simpleshop.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.simpleshop.model.CartItem
 import com.example.simpleshop.model.Product
-import com.example.simpleshop.model.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ShopViewModel : ViewModel() {
 
@@ -16,28 +18,26 @@ class ShopViewModel : ViewModel() {
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> = _cartItems.asStateFlow()
 
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
-
     init {
-        // Initialize with dummy data
-        _products.value = listOf(
-            Product(1, "Premium Headphones", "Noise cancelling wireless headphones", 299.99),
-            Product(2, "Smart Watch", "Track your health and fitness", 199.49),
-            Product(3, "Wireless Mouse", "Ergonomic design for long hours", 49.99),
-            Product(4, "Mechanical Keyboard", "RGB backlit mechanical keyboard", 89.00),
-            Product(5, "USB-C Hub", "Multi-port adapter for your laptop", 35.50),
-            Product(6, "Gaming Monitor", "27-inch 144Hz 4K display", 450.00)
-        )
+        loadProducts()
     }
 
-    fun login(username: String) {
-        _currentUser.value = User(username, "$username@example.com", true)
-    }
-
-    fun logout() {
-        _currentUser.value = null
-        _cartItems.value = emptyList()
+    private fun loadProducts() {
+        viewModelScope.launch(Dispatchers.Default) {
+            // Loading products in background to keep UI responsive during startup
+            _products.value = listOf(
+                Product(1, "Premium Headphones", "Noise cancelling wireless headphones", 299.99, "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80"),
+                Product(2, "Smart Watch", "Track your health and fitness", 199.49, "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80"),
+                Product(3, "Wireless Mouse", "Ergonomic design for long hours", 49.99, "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80"),
+                Product(4, "Mechanical Keyboard", "RGB backlit mechanical keyboard", 89.00, "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=400&q=80"),
+                Product(5, "USB-C Hub", "Multi-port adapter for your laptop", 35.50, "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&q=80"),
+                Product(6, "Gaming Monitor", "27-inch 144Hz 4K display", 450.00, "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80"),
+                Product(7, "Laptop Pro", "Powerful laptop for professionals", 1299.99, "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80"),
+                Product(8, "Digital Camera", "High resolution mirrorless camera", 799.00, "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80"),
+                Product(9, "Bluetooth Speaker", "Portable speaker with deep bass", 59.99, "https://images.unsplash.com/photo-1608156639585-34a072755c96?w=400&q=80"),
+                Product(10, "External SSD", "1TB fast external storage", 120.00, "https://images.unsplash.com/photo-1597740985671-2a8a3b80502e?w=400&q=80")
+            )
+        }
     }
 
     fun addToCart(product: Product) {
